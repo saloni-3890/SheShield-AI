@@ -1,18 +1,40 @@
 const express = require("express");
-const cors = require("cors");
+const sequelize = require("./config/database");
 
+const User = require("./models/User");
+const authRoutes = require("./routes/authRoutes");
+const emergencyContactRoutes = require("./routes/emergencyContactRoutes");
+require("./models/associations");
+const sosRoutes = require("./routes/sosRoutes");
 const app = express();
 
-// Middleware
-app.use(cors());
 app.use(express.json());
 
-// Health Check
+app.use("/api/auth", authRoutes);
+app.use("/api/contacts", emergencyContactRoutes);
+app.use("/api/sos", sosRoutes);
+
 app.get("/api/health", (req, res) => {
-    res.status(200).json({
+    res.json({
         success: true,
-        message: "SheShield AI Backend is running",
+        message: "SheShield API is running",
     });
 });
+
+const testDatabase = async () => {
+    try {
+        await sequelize.authenticate();
+
+        console.log("✅ PostgreSQL database connected successfully.");
+
+        await sequelize.sync();
+
+        console.log("✅ Database tables synchronized successfully.");
+    } catch (error) {
+        console.error("❌ Database connection failed:");
+        console.error(error.message);
+    }
+};
+testDatabase();
 
 module.exports = app;

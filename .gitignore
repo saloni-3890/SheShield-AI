@@ -1,16 +1,15 @@
-# Environment
-.env
-.env.*
-!.env.example
-
 # Node
 backend/node_modules/
+
+# Environment / secrets
 backend/.env
+.env
+.env.*
 
 # Flutter
 frontend/.dart_tool/
-frontend/.packages
 frontend/build/
+frontend/.packages
 frontend/.flutter-plugins
 frontend/.flutter-plugins-dependencies
 
@@ -19,8 +18,8 @@ frontend/android/.gradle/
 frontend/android/local.properties
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 
 # OS
 .DS_Store
