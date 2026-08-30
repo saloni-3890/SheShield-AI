@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -41,13 +41,27 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (success) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const HomeScreen(),
-          ),
-        );
-      } else {
+  final fcmToken =
+      await FirebaseMessaging.instance.getToken();
+
+  if (fcmToken != null) {
+    final tokenSaved =
+        await authService.saveFcmToken(fcmToken);
+
+    debugPrint(
+      "FCM TOKEN SAVE RESULT: $tokenSaved",
+    );
+  }
+
+  if (!mounted) return;
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const HomeScreen(),
+    ),
+  );
+}else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Invalid email or password"),

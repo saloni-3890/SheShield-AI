@@ -42,7 +42,7 @@ const createSosAlert = async (req, res) => {
             where: {
                 userId: req.user.id,
             },
-            attributes: ["id", "name", "phone", "relation"],
+            attributes: ["id", "name", "phone", "relation", "fcmToken"],
         });
 
         await sendSosNotification(contacts, alert);

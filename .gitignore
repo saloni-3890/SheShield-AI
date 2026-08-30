@@ -17,6 +17,13 @@ frontend/.flutter-plugins-dependencies
 frontend/android/.gradle/
 frontend/android/local.properties
 
+# Firebase / sensitive config
+frontend/android/app/google-services.json
+
+# Temporary debug/error files
+frontend/build_error.txt
+frontend/gradle_error.txt
+
 # IDE
 .idea/
 .vscode/

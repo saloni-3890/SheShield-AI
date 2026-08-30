@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
-app.use("/api/contacts", emergencyContactRoutes);
+app.use("/api/emergency-contacts", emergencyContactRoutes);
 app.use("/api/sos", sosRoutes);
 
 app.get("/api/health", (req, res) => {

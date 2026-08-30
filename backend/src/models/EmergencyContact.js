@@ -14,6 +14,16 @@ const EmergencyContact = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+   contactUserId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+        model: "users",
+        key: "id",
+    },
+    onUpdate: "CASCADE",
+    onDelete: "SET NULL",
+},
 
         name: {
             type: DataTypes.STRING,
@@ -29,6 +39,11 @@ const EmergencyContact = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true,
         },
+fcmToken: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+},
+
     },
     {
         tableName: "emergency_contacts",
