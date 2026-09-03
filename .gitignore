@@ -31,3 +31,5 @@ frontend/gradle_error.txt
 # OS
 .DS_Store
 Thumbs.db
+# Flutter DevTools
+frontend/devtools_options.yaml
