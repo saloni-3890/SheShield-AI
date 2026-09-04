@@ -19,6 +19,8 @@ frontend/android/local.properties
 
 # Firebase / sensitive config
 frontend/android/app/google-services.json
+# API config
+frontend/lib/config/api_config.dart
 
 # Temporary debug/error files
 frontend/build_error.txt
