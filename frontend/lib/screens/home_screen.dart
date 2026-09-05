@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'ai_companion_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/auth_service.dart';
 import 'emergency_contacts_screen.dart';
@@ -271,6 +272,20 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.contact_phone),
               label: const Text("Emergency Contacts"),
             ),
+            const SizedBox(height: 16),
+
+ElevatedButton.icon(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AiCompanionScreen(),
+      ),
+    );
+  },
+  icon: const Icon(Icons.psychology),
+  label: const Text("Ask SheShield AI"),
+),
           ],
         ),
       ),

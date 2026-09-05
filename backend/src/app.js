@@ -1,6 +1,6 @@
 const express = require("express");
 const sequelize = require("./config/database");
-
+const aiRoutes = require("./routes/ai");
 const User = require("./models/User");
 const authRoutes = require("./routes/authRoutes");
 const emergencyContactRoutes = require("./routes/emergencyContactRoutes");
@@ -13,7 +13,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/emergency-contacts", emergencyContactRoutes);
 app.use("/api/sos", sosRoutes);
-
+app.use("/api/ai", aiRoutes);
 app.get("/api/health", (req, res) => {
     res.json({
         success: true,
