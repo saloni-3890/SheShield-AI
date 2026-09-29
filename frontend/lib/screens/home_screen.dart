@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'ai_companion_screen.dart';
-import 'package:geolocator/geolocator.dart';
 import '../services/auth_service.dart';
 import 'emergency_contacts_screen.dart';
 import 'login_screen.dart';
-import '../services/emergency_contact_service.dart';
-import '../services/sms_service.dart';
-
+import 'stories_screen.dart';
+import '../services/sos_service.dart';
+import 'safety_toolkit_screen.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -16,9 +15,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final AuthService authService = AuthService();
-  final EmergencyContactService contactService = EmergencyContactService();
-  final SmsService smsService = SmsService();
 
+  final SosService sosService = SosService();
   bool sosLoading = false;
 
   Future<void> activateSOS() async {
@@ -29,147 +27,32 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      // 1. Check whether location service is enabled
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final success = await sosService.activateSOS();
 
-      if (!serviceEnabled) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please turn on Location")),
-        );
-
-        return;
-      }
-
-      // 2. Check location permission
-      LocationPermission permission = await Geolocator.checkPermission();
-
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Location permission denied")),
-        );
-
-        return;
-      }
-
-      // 3. Get current location
-      debugPrint("SOS: Location request started");
-
-      final Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      );
-
-      debugPrint("SOS: Location received");
-      debugPrint("SOS Latitude: ${position.latitude}");
-      debugPrint("SOS Longitude: ${position.longitude}");
-
-      // 4. Save SOS in backend
-      final success = await authService.createSosAlert(
-        position.latitude,
-        position.longitude,
-      );
-
-      if (!success) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("SOS location could not be sent to server"),
-          ),
-        );
-
-        return;
-      }
-
-      // 5. Get emergency contacts
-      debugPrint("SOS: Loading emergency contacts...");
-
-      final contacts = await contactService.getContacts();
-
-      debugPrint("SOS: ${contacts.length} emergency contacts found");
-
-      if (contacts.isEmpty) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("SOS saved, but no emergency contacts found."),
-          ),
-        );
-
-        return;
-      }
-
-      // 6. Request SMS permission
-      final smsPermission = await smsService.requestPermission();
-
-      if (!smsPermission) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("SMS permission denied.")));
-
-        return;
-      }
-
-      // 7. Send SMS to every emergency contact
-      int sentCount = 0;
-
-      for (final contact in contacts) {
-        final phone = contact["phone"]?.toString().trim();
-
-        if (phone == null || phone.isEmpty) {
-          debugPrint("SOS: No phone number for ${contact["name"]}");
-          continue;
-        }
-
-        debugPrint("SOS: Sending SMS to ${contact["name"]} - $phone");
-
-        final smsSent = await smsService.sendSosSms(
-          phone: phone,
-          latitude: position.latitude,
-          longitude: position.longitude,
-        );
-
-        if (smsSent) {
-          sentCount++;
-
-          debugPrint("SOS: SMS successfully sent to $phone");
-        }
-      }
-
-      // 8. Show result
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "🚨 SOS Activated!\n"
-            "Location saved successfully.\n"
-            "SMS sent to $sentCount/${contacts.length} contacts.",
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "🚨 SOS Activated!\n"
+              "Location saved and emergency contacts notified.",
+            ),
+            duration: Duration(seconds: 5),
           ),
-          duration: const Duration(seconds: 5),
-        ),
-      );
+        );
+      }
     } catch (e) {
       debugPrint("SOS ERROR: $e");
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("SOS failed: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("SOS failed: $e"),
+          duration: const Duration(seconds: 4),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -178,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
-
   void showSOSDialog() {
     showDialog(
       context: context,
@@ -285,6 +167,34 @@ ElevatedButton.icon(
   },
   icon: const Icon(Icons.psychology),
   label: const Text("Ask SheShield AI"),
+),
+const SizedBox(height: 16),
+
+ElevatedButton.icon(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const StoriesScreen(),
+      ),
+    );
+  },
+  icon: const Icon(Icons.auto_stories),
+  label: const Text("Real Stories"),
+),
+const SizedBox(height: 16),
+
+ElevatedButton.icon(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SafetyToolkitScreen(),
+      ),
+    );
+  },
+  icon: const Icon(Icons.shield_outlined),
+  label: const Text("Safety Toolkit"),
 ),
           ],
         ),

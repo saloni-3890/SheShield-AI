@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
 class AiService {
-  static const String baseUrl = "http://10.243.54.100:5000/api";
+  static const String baseUrl = "http://10.50.189.100:5000/api";
 
   static Future<Map<String, dynamic>> analyzeProblem(
     String problem,
